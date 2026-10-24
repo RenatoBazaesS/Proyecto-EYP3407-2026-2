@@ -1,0 +1,43 @@
+EYP3407 - Caso 08: NYC 311
+Copia de datos preparada el 12 de octubre de 2026.
+
+SUBCONJUNTO ENTREGADO
+Solicitudes de HPD, tipo PLUMBING, creadas en 2021–2023. Se conservan cierres registrados en la copia descargada; los campos posteriores deben excluirse de los predictores.
+
+ARCHIVOS Y VARIABLES
+datos.csv: solicitudes identificadas por unique_key; created_date y
+closed_date registran apertura y cierre administrativo. Se conserva el estado
+descargado; no se ha construido la respuesta a siete días.
+diccionario.csv: descripción de los campos publicados por la fuente.
+La ausencia de closed_date significa que no hay cierre registrado en esta
+copia; no demuestra que el problema material siga sin solución.
+
+LECTURA Y USO
+Los CSV utilizan UTF-8, coma separadora y punto decimal. Los nombres y códigos
+originales se conservan. Un valor ausente no equivale a cero.
+Descomprima este paquete en datos/ de su repositorio. Trabaje exclusivamente
+con estos archivos y con la población y respuesta de la ficha del ANEXO.
+Las transformaciones y el análisis deben programarse en el repositorio del equipo.
+No es necesario descargar de nuevo las fuentes ni ejecutar código de extracción.
+
+PROCEDENCIA
+La copia entregada es el punto de partida de la reproducción. Los portales
+pueden revisar sus datos después de la descarga. Cite al productor original,
+la edición o fecha de descarga y las referencias del ANEXO. Consulte las
+condiciones de reutilización de la fuente al publicar los datos.
+
+Fuentes utilizadas en la preparación:
+caso08_pagina_0.csv
+https://data.cityofnewyork.us/resource/erm2-nwe9.csv?%24where=created_date+%3E%3D+%272021-01-01T00%3A00%3A00%27+AND+created_date+%3C+%272024-01-01T00%3A00%3A00%27+AND+agency+%3D+%27HPD%27+AND+complaint_type+%3D+%27PLUMBING%27&%24order=created_date%2Cunique_key&%24limit=50000&%24offset=0
+
+caso08_pagina_50000.csv
+https://data.cityofnewyork.us/resource/erm2-nwe9.csv?%24where=created_date+%3E%3D+%272021-01-01T00%3A00%3A00%27+AND+created_date+%3C+%272024-01-01T00%3A00%3A00%27+AND+agency+%3D+%27HPD%27+AND+complaint_type+%3D+%27PLUMBING%27&%24order=created_date%2Cunique_key&%24limit=50000&%24offset=50000
+
+caso08_pagina_100000.csv
+https://data.cityofnewyork.us/resource/erm2-nwe9.csv?%24where=created_date+%3E%3D+%272021-01-01T00%3A00%3A00%27+AND+created_date+%3C+%272024-01-01T00%3A00%3A00%27+AND+agency+%3D+%27HPD%27+AND+complaint_type+%3D+%27PLUMBING%27&%24order=created_date%2Cunique_key&%24limit=50000&%24offset=100000
+
+caso08_pagina_150000.csv
+https://data.cityofnewyork.us/resource/erm2-nwe9.csv?%24where=created_date+%3E%3D+%272021-01-01T00%3A00%3A00%27+AND+created_date+%3C+%272024-01-01T00%3A00%3A00%27+AND+agency+%3D+%27HPD%27+AND+complaint_type+%3D+%27PLUMBING%27&%24order=created_date%2Cunique_key&%24limit=50000&%24offset=150000
+
+nyc_metadata.json
+https://data.cityofnewyork.us/api/views/erm2-nwe9.json

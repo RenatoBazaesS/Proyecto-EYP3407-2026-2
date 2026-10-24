@@ -1,0 +1,81 @@
+variable,nombre,tipo,descripcion
+unique_key,Unique Key,text,"Unique identifier of a Service Request (SR) in the open data set
+"
+created_date,Created Date,calendar_date,"Date SR  was created
+"
+closed_date,Closed Date,calendar_date,"Date SR was closed by responding agency
+"
+agency,Agency,text,"Acronym of responding City Government Agency
+"
+agency_name,Agency Name,text,Full Agency name of responding City Government Agency
+complaint_type,Problem (formerly Complaint Type),text,This is the first level of a hierarchy identifying the topic of the incident or condition.  Problem (formerly Complaint Type) broadly describes the topic of the incident or condition and are defined by the responding agencies. New Problems may be added in response to changes in customer demand.
+descriptor,Problem Detail (formerly Descriptor),text,"This is associated to the Problem (formerly Complaint Type), and provides further detail on the incident or condition. Problem Detail (formerly Descriptor) values are dependent on the Problem, and are not always required in the service request."
+descriptor_2,Additional Details,text,A third level of detail about the Problem (formerly Complaint Type) beyond the Problem Detail (formerly Descriptor). This is not used by every category of issue.
+location_type,Location Type,text,"Describes the type of location used in the address information 
+"
+incident_zip,Incident Zip,text,"Incident location zip code, provided by geo validation.
+"
+incident_address,Incident Address,text,"House number of incident address provided by submitter.
+"
+street_name,Street Name,text,"Street name of incident address provided by the submitter
+"
+cross_street_1,Cross Street 1,text,"First Cross street based on the geo validated incident location
+"
+cross_street_2,Cross Street 2,text,"Second Cross Street based on the geo validated incident location
+"
+intersection_street_1,Intersection Street 1,text,"First intersecting street based on geo validated incident location
+"
+intersection_street_2,Intersection Street 2,text,"Second intersecting street based on geo validated incident location
+"
+address_type,Address Type,text,"Type of incident location information available.
+"
+city,City,text,"City of the incident location provided by geovalidation.
+"
+landmark,Landmark,text,"If the incident location is identified as a Landmark the name of the landmark will display here
+"
+facility_type,Facility Type,text,"If available, this field describes the type of city facility associated to the SR
+"
+status,Status,text,"Status of SR submitted 
+"
+due_date,Due Date,calendar_date,"Date when responding agency is expected to update the SR.  This is based on the Complaint Type and internal Service Level Agreements (SLAs).
+"
+resolution_description,Resolution Description,text,"Describes the last action taken on the SR by the responding agency.  May describe next or future steps. 
+"
+resolution_action_updated_date,Resolution Action Updated Date,calendar_date,"Date when responding agency last updated the SR.
+"
+community_board,Community Board,text,"Provided by geovalidation.
+"
+council_district,Council District,text,The City Council district where the service request is located.
+police_precinct,Police Precinct,text,The NYPD precinct where the service request is located.
+bbl,BBL,text,"Borough Block and Lot, provided by geovalidation. Parcel number to identify the location of location of buildings and properties in NYC."
+borough,Borough,text,"Provided by the submitter and confirmed by geovalidation.
+"
+x_coordinate_state_plane,X Coordinate (State Plane),number,"Geo validated, X coordinate of the incident location. 
+"
+y_coordinate_state_plane,Y Coordinate (State Plane),number,"Geo validated,  Y coordinate of the incident location. 
+"
+open_data_channel_type,Open Data Channel Type,text,"Indicates how the SR was submitted to 311.  i.e. By Phone, Online, Mobile, Other or Unknown."
+park_facility_name,Park Facility Name,text,"If the incident location is a Parks Dept facility, the Name of the facility will appear here
+"
+park_borough,Park Borough,text,"The borough of incident if it is a Parks Dept facility
+"
+vehicle_type,Vehicle Type,text,"If the incident is a taxi, this field describes the type of TLC vehicle. 
+"
+taxi_company_borough,Taxi Company Borough,text,"If the incident is identified as a taxi, this field will display the borough of the taxi company. 
+"
+taxi_pick_up_location,Taxi Pick Up Location,text,"If the incident is identified as a taxi, this field displays the taxi pick up location
+"
+bridge_highway_name,Bridge Highway Name,text,"If the incident is identified as a Bridge/Highway, the name will be displayed here.
+"
+bridge_highway_direction,Bridge Highway Direction,text,"If the incident is identified as a Bridge/Highway, the direction where the issue took place would be displayed here.
+"
+road_ramp,Road Ramp,text,"If the incident location was Bridge/Highway this column differentiates if the issue was on the Road or the Ramp.
+"
+bridge_highway_segment,Bridge Highway Segment,text,"Additional information on the section of the Bridge/Highway were the incident took place.
+"
+latitude,Latitude,number,"Geo based Lat of the incident location
+"
+longitude,Longitude,number,"Geo based Long of the incident location
+"
+location,Location,point,"Combination of the geo based lat & long of the incident location
+"
