@@ -2,7 +2,7 @@
 
 ## Integrantes
 - Diego Barrios (@nickname1)
-- Renato Bazaes (@RenatoBazaesS)
+- Renato Bazaes [@RenatoBazaesS](https://github.com/RenatoBazaesS)
 - Mauricio Campillay (@nickname3)
 - Bruno Zavala (@nickname4)
 
@@ -20,8 +20,8 @@ Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de HPD tipo PLUMBING,
 - Archivo original: `caso08_nyc311.zip` (incluido en `datos/`).
 - Fuente: NYC Open Data, *311 Service Requests from 2020 to Present* (erm2-nwe9).
 - Fecha de la copia: 12 de octubre de 2026 (según `LEEME.txt`).
-- Filtros de la copia: agency = HPD, complaint_type = PLUMBING,
-  created_date entre 2021-01-01 y 2023-12-31.
+- Filtros de la copia: `agency = HPD`, `complaint_type = PLUMBING`,
+  `created_date` entre 2021-01-01 y 2023-12-31.
 - Contenido del zip: `datos.csv`, `diccionario.csv`, `LEEME.txt`.
 - MD5 del zip: <pegar salida de tools::md5sum("datos/caso08_nyc311.zip")>.
 - Los archivos originales NO se editan manualmente; cualquier
@@ -29,36 +29,38 @@ Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de HPD tipo PLUMBING,
 - Si `datos/datos.csv` no existe, `analisis.R` descomprime el zip en `datos/`.
 - Condiciones de uso: ver portal NYC Open Data.
 
-## Estructura del proyecto
+## Estructura del proyecto (probable)
+
+```text
 proyecto/
 │
-├── analisis.R                 # punto de entrada único (ejecuta y genera todo)
+├── analisis.R                      # punto de entrada único (ejecuta y genera todo)
 ├── README.md
-├── renv.lock                  # versiones exactas de paquetes
-├── informe.qmd                # fuente del informe (genera informe.pdf)
+├── renv.lock                       # versiones exactas de paquetes
+├── informe.qmd                     # fuente del informe (genera informe.pdf)
 ├── .gitignore
 │
-├── R/ # Opcional (solamente si queremos dividir por secciones el proyecto)
-│   ├── 01_preparacion.R       # auditoría, construcción de Y, base analítica
-│   ├── 02_particiones.R       # desarrollo/prueba, ventanas temporales
-│   ├── 03_modelos.R           # referencia, M1, M2, M3
-│   ├── 04_evaluacion.R        # métricas, comparación, incertidumbre
-│   └── 05_diagnostico.R       # errores por subgrupo, sensibilidades
+├── R/                              # Opcional (solo si dividimos por secciones el proyecto)
+│   ├── 01_preparacion.R            # auditoría, construcción de Y, base analítica
+│   ├── 02_particiones.R            # desarrollo/prueba, ventanas temporales
+│   ├── 03_modelos.R                # referencia, M1, M2, M3
+│   ├── 04_evaluacion.R             # métricas, comparación, incertidumbre
+│   └── 05_diagnostico.R            # errores por subgrupo, sensibilidades
 │
 ├── datos/
-│   ├── caso08_nyc311.zip      # paquete original sin editar
-│   ├── datos.csv              # extraído del zip 
-│   ├── diccionario.csv        # definiciones de variable
-│   └── LEEME.txt              # información de los datos
+│   ├── caso08_nyc311.zip           # paquete original sin editar
+│   ├── datos.csv                   # extraído del zip
+│   ├── diccionario.csv             # definiciones de variable
+│   └── LEEME.txt                   # información de los datos
 │
 ├── docs/
 │   └── 00_definicion_problema.md
 │
-└── output/                    # se genera al ejecutar analisis.R
+└── output/                         # se genera al ejecutar analisis.R
     ├── tablas/
     ├── figuras/
     └── sessionInfo.txt
-
+```
 ## Instalación
 1. Clonar el repositorio.
 2. Abrir R en la raíz del proyecto.
