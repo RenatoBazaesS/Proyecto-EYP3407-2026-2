@@ -19,7 +19,7 @@ Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de HPD tipo PLUMBING,
 ## Datos
 - Archivo original: `caso08_nyc311.zip` (incluido en `datos/`).
 - Fuente: NYC Open Data, *311 Service Requests from 2020 to Present* (erm2-nwe9).
-- Fecha de la copia: 12 de octubre de 2026 (según `LEEME.txt`).
+- Fecha de la copia: 12 de octubre de 2026 (según `datos/LEEME.txt`).
 - Filtros de la copia: `agency = HPD`, `complaint_type = PLUMBING`,
   `created_date` entre 2021-01-01 y 2023-12-31.
 - Contenido del zip: `datos.csv`, `diccionario.csv`, `LEEME.txt`.
@@ -27,7 +27,7 @@ Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de HPD tipo PLUMBING,
 - Los archivos originales NO se editan manualmente; cualquier
   transformación se hace en `R/01_preparacion.R`.
 - Si `datos/datos.csv` no existe, `analisis.R` descomprime el zip en `datos/`.
-- Condiciones de uso: ver portal NYC Open Data.
+
 
 ## Estructura del proyecto (probable)
 
@@ -38,7 +38,6 @@ proyecto/
 ├── README.md
 ├── renv.lock                       # versiones exactas de paquetes
 ├── informe.qmd                     # fuente del informe (genera informe.pdf)
-├── .gitignore
 │
 ├── R/                              # Opcional (solo si dividimos por secciones el proyecto)
 │   ├── 01_preparacion.R            # auditoría, construcción de Y, base analítica
