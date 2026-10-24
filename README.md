@@ -18,19 +18,6 @@ Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de la agencia HPD con c
 - Gestión de dependencias: `renv` (ver `renv.lock`).
 - Paquetes principales usados: 
 
-## Datos
-- Archivo original: `caso08_nyc311.zip` (incluido en `datos/`).
-- Fuente: NYC Open Data, *311 Service Requests from 2020 to Present* (erm2-nwe9).
-- Fecha de la copia: 12 de octubre de 2026 (según `datos/LEEME.txt`).
-- Filtros de la copia: `agency = HPD`, `complaint_type = PLUMBING`,
-  `created_date` entre 2021-01-01 y 2023-12-31.
-- Contenido del zip: `datos.csv`, `diccionario.csv`, `LEEME.txt`.
-- MD5 del zip: <pegar salida de tools::md5sum("datos/caso08_nyc311.zip")>.
-- Los archivos originales NO se editan manualmente; cualquier
-  transformación se hace en `R/01_preparacion.R`.
-- Si `datos/datos.csv` no existe, `analisis.R` descomprime el zip en `datos/`.
-
-
 ## Estructura del proyecto (probable)
 
 ```text
@@ -62,6 +49,20 @@ proyecto/
     ├── figuras/
     └── sessionInfo.txt
 ```
+
+## Datos
+- Archivo original: `caso08_nyc311.zip` (incluido en `datos/`).
+- Fuente: NYC Open Data, *311 Service Requests from 2020 to Present* (erm2-nwe9).
+- Fecha de la copia: 12 de octubre de 2026 (según `datos/LEEME.txt`).
+- Filtros de la copia: `agency = HPD`, `complaint_type = PLUMBING`,
+  `created_date` entre 2021-01-01 y 2023-12-31.
+- Contenido del zip: `datos.csv`, `diccionario.csv`, `LEEME.txt`.
+- MD5 del zip: <pegar salida de tools::md5sum("datos/caso08_nyc311.zip")>.
+- Los archivos originales NO se editan manualmente; cualquier
+  transformación se hace en `R/01_preparacion.R`.
+- Si `datos/datos.csv` no existe, `analisis.R` descomprime el zip en `datos/`.
+
+
 ## Instalación
 1. Clonar el repositorio.
 2. Abrir R en la raíz del proyecto.
