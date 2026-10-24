@@ -7,14 +7,16 @@
 - Bruno Zavala (@nickname4)
 
 ## Caso asignado
-Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de HPD tipo PLUMBING,
+Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de la agencia HPD con categoría PLUMBING entre 2021 y 2023,
 ¿cuál es la probabilidad de que siga sin cierre administrativo al cumplirse 7 días?
+
+## Contexto y finalidad
+
 
 ## Entorno
 - Lenguaje: R versión X.Y.Z (ver `output/sessionInfo.txt` para la sesión completa).
 - Gestión de dependencias: `renv` (ver `renv.lock`).
-- Paquetes principales: readr, dplyr, lubridate, tidymodels, recipes,
-  parsnip, ranger, xgboost, yardstick, probably, ggplot2, scales, quarto.
+- Paquetes principales usados: 
 
 ## Datos
 - Archivo original: `caso08_nyc311.zip` (incluido en `datos/`).
