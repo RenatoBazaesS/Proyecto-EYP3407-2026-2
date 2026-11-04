@@ -14,11 +14,13 @@ Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de la agencia HPD con c
 
 
 ## Entorno
-- Lenguaje: R versión X.Y.Z (ver `output/sessionInfo.txt` para la sesión completa).
-- Gestión de dependencias: `renv` (ver `renv.lock`).
-- Paquetes principales usados: 
+- Lenguaje: R versión 4.5.0.
+- Gestión de dependencias: `renv` versión 1.3.1 (ver `renv.lock`).
+- Paquetes principales usados:  `readr`, `dplyr`, `lubridate`, `tidymodels`,
+  `ranger`, `xgboost`, `yardstick`, `probably`,
+  `ggplot2`, `scales`, `quarto`
 
-## Estructura del proyecto (probable)
+## Estructura del proyecto (por ahora)
 
 ```text
 proyecto/
@@ -28,7 +30,7 @@ proyecto/
 ├── renv.lock                       # versiones exactas de paquetes
 ├── informe.qmd                     # fuente del informe (genera informe.pdf)
 │
-├── R/                              # Opcional (solo si dividimos por secciones el proyecto)
+├── R/                              
 │   ├── 01_preparacion.R            # auditoría, construcción de Y, base analítica
 │   ├── 02_particiones.R            # desarrollo/prueba, ventanas temporales
 │   ├── 03_modelos.R                # referencia, M1, M2, M3
@@ -57,16 +59,13 @@ proyecto/
 - Filtros de la copia: `agency = HPD`, `complaint_type = PLUMBING`,
   `created_date` entre 2021-01-01 y 2023-12-31.
 - Contenido del zip: `datos.csv`, `diccionario.csv`, `LEEME.txt`.
-- MD5 del zip: <pegar salida de tools::md5sum("datos/caso08_nyc311.zip")>.
-- Los archivos originales NO se editan manualmente; cualquier
-  transformación se hace en `R/01_preparacion.R`.
-- Si `datos/datos.csv` no existe, `analisis.R` descomprime el zip en `datos/`.
-
+- MD5 del zip: 42a7931a2a2b19fdfa04b73823c85903.
+- Toda transformación a los archivos originales se hace en `R/01_preparacion.R`.
 
 ## Instalación
 1. Clonar el repositorio.
 2. Abrir R en la raíz del proyecto.
-3. `renv::restore()`
+3. Ejecutar `renv::restore()`
 
 ## Ejecución
 ```r
@@ -78,9 +77,8 @@ diagnóstico y la generación de `informe.pdf`, tablas y figuras.
 ## Reproducibilidad y costo
 - Semilla fija: `set.seed(3407)` en `analisis.R`.
 - Tiempo aproximado de ejecución: <XX> min.
-- Sistema de referencia: <SO, R X.Y.Z, RAM y núcleos>.
+- Sistema de referencia: <Windows, R 4.5.0>.
 - La sesión completa queda registrada en `output/sessionInfo.txt`.
-- Versión del repositorio usada en el informe: commit `<hash>` / tag `<v1.0>`.
 
 ## Prueba desde una copia limpia
 - Fecha:
