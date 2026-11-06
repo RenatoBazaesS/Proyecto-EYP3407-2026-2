@@ -1,12 +1,12 @@
 ---
 title: "Plazos de cierre de solicitudes NYC 311"
-subtitle: "Análisis estadístico reproducible — Caso 08"
+subtitle: "Análisis estadístico — Caso 08"
 author:
   - Diego Barrios
   - Renato Bazaes
   - Mauricio Campillay
   - Bruno Zavala
-date: "`r format(Sys.Date(), '%d de %B de %Y')`"
+date: "12/11/2016"
 lang: es
 format:
   pdf:
@@ -53,27 +53,29 @@ base <- readRDS("output/datos_auditados.rds")
 
 # Resumen ejecutivo
 
-```{=html}
 <!-- Máximo 250 palabras. Debe incluir: problema, resultado principal,
 recomendación y principal limitación. Se completa al final, cuando
 existan los resultados de Fase 4. -->
-```
+
 (Pendiente: 250 palabras máximo.)
 
 # Problema y datos
 
 ## Contexto y pregunta
 
-```{=html}
 <!-- Audiencia, decisión que apoya, población, unidad, respuesta,
 horizonte, disponibilidad de predictores, naturaleza retrospectiva.
 Sale de docs/00_definicion_problema.md. -->
-```
+
 (Pendiente.)
 
 ## Procedencia de los datos
 
-Fuente: NYC Open Data, *311 Service Requests from 2020 to Present* (identificador `erm2-nwe9`). Copia descargada el 12 de octubre de 2026 según `LEEME.txt`. Filtros aplicados en la copia: `agency = HPD`, `complaint_type = PLUMBING`, `created_date` entre 2021-01-01 y 2023-12-31. Los archivos originales no se editaron manualmente.
+Fuente: NYC Open Data, *311 Service Requests from 2020 to Present*
+(identificador `erm2-nwe9`). Copia descargada el 12 de octubre de 2026
+según `LEEME.txt`. Filtros aplicados en la copia: `agency = HPD`,
+`complaint_type = PLUMBING`, `created_date` entre 2021-01-01 y
+2023-12-31. Los archivos originales no se editaron manualmente.
 
 ## Construcción de la muestra
 
@@ -97,62 +99,32 @@ variables |>
   knitr::kable()
 ```
 
-## Descripción de la respuesta y la muestra
+## Descripción de la muestra
 
-```{r tabla-descripcion}
-#| tbl-cap: "Descripción de la muestra analítica."
+La base analítica contiene
+`r format(nrow(base), big.mark = ",")`
+solicitudes únicas, correspondientes a
+`r format(n_distinct(base$bbl, na.rm = TRUE), big.mark = ",")`
+edificios (`bbl`) distintos, con fechas de creación entre
+`r format(min(base$created_date, na.rm = TRUE), "%d/%m/%Y")` y
+`r format(max(base$created_date, na.rm = TRUE), "%d/%m/%Y")`.
+La prevalencia de la respuesta (sin cierre a 7 días) es
+`r sprintf("%.1f%%", 100 * mean(base$Y, na.rm = TRUE))`.
 
-descripcion |>
-  rename(Métrica = metrica, Valor = valor) |>
-  knitr::kable()
-```
-
-```{r tabla-auditoria-Y}
-#| tbl-cap: "Auditoría de la respuesta Y."
-
-auditoria_Y |>
-  rename(Caso = caso, n = n, `%` = pct) |>
-  knitr::kable(digits = 2)
-```
-
-```{r tabla-cobertura}
-#| tbl-cap: "Cobertura por año y borough."
-
-cobertura |>
-  knitr::kable()
-```
-
-## Calidad de los datos
-
-```{r tabla-calidad}
-#| tbl-cap: "Porcentaje de valores faltantes por variable."
-
-calidad_na |>
-  rename(Variable = variable, `% NA` = pct_na) |>
-  knitr::kable(digits = 2)
-```
-
-```{r tabla-cardinalidad}
-#| tbl-cap: "Número de niveles por variable categórica."
-
-cardinalidad |>
-  rename(Variable = variable, `Niveles` = n_niveles) |>
-  knitr::kable()
-```
-
-(Interpretación: variables candidatas a agrupar categorías raras.)
+El detalle de la auditoría de la respuesta, la distribución por año y
+borough, los valores faltantes por variable y la cardinalidad de las
+categorías se reportan en el Anexo técnico (secciones A.1–A.4).
 
 # Diseño de evaluación
 
 ## Particiones
 
-```{=html}
 <!-- Esquema desarrollo/prueba, ventanas temporales, separación de 7 días.
 Incluir un diagrama temporal (figura) que muestre:
 - periodo de desarrollo (2021–2022) con ventanas expansivas,
 - separación de 7 días entre origen de validación y entrenamiento,
 - reserva (2023). -->
-```
+
 (Pendiente: figura de diagrama temporal.)
 
 ```{r fig-diagrama-temporal}
@@ -164,39 +136,46 @@ Incluir un diagrama temporal (figura) que muestre:
 
 ## Información admisible
 
-Solo predictores disponibles al ingreso de la solicitud. Se excluyen `closed_date`, `status`, `resolution_description`, `resolution_action_updated_date`, `due_date` y `unique_key`. El historial del área, si se usa, se construye solo con solicitudes cuyo horizonte de 7 días ya terminó.
+Solo predictores disponibles al ingreso de la solicitud. Se excluyen
+`closed_date`, `status`, `resolution_description`,
+`resolution_action_updated_date`, `due_date` y `unique_key`. El
+historial del área, si se usa, se construye solo con solicitudes cuyo
+horizonte de 7 días ya terminó.
 
 ## Métrica principal y métricas complementarias
 
--   Métrica principal: pérdida logarítmica (log-loss).
--   Complementarias: Brier, AUC ROC, calibración, sensibilidad, VPP con umbral fijado en desarrollo, matriz de confusión.
+- Métrica principal: pérdida logarítmica (log-loss).
+- Complementarias: Brier, AUC ROC, calibración, sensibilidad, VPP con
+  umbral fijado en desarrollo, matriz de confusión.
 
 ## Referencia
 
-Tasa histórica de “sin cierre a 7 días” estimada **solo con entrenamiento**.
+Tasa histórica de “sin cierre a 7 días” estimada **solo con
+entrenamiento**.
 
 # Métodos
 
 ## Procedimientos comparados
 
-| Procedimiento | Modelo                                                      | Justificación                                                      |
-|------------------------|------------------------|------------------------|
-| Referencia    | Tasa histórica de Y en entrenamiento                        | Alternativa razonable y calculada solo con entrenamiento           |
-| M1            | Regresión logística con penalización elegida por validación | Base interpretable; maneja alta dimensionalidad tras codificación  |
-| M2            | (Árbol podado o SVM de clasificación)                       | Captura no linealidades / interacciones con control de complejidad |
-| M3            | (Random forest o boosting)                                  | Ensamble con mejor capacidad predictiva esperada                   |
+| Procedimiento | Modelo | Justificación |
+|---|---|---|
+| Referencia | Tasa histórica de Y en entrenamiento | Alternativa razonable y calculada solo con entrenamiento |
+| M1 | Regresión logística con penalización elegida por validación | Base interpretable; maneja alta dimensionalidad tras codificación |
+| M2 | (Árbol podado o SVM de clasificación) | Captura no linealidades / interacciones con control de complejidad |
+| M3 | (Random forest o boosting) | Ensamble con mejor capacidad predictiva esperada |
 
 ## Preprocesamiento
 
-```{=html}
 <!-- Imputación simple, agrupación de categorías raras, codificación,
-todo dentro de recipes y ajustado en cada fold. -->
-```
+todo dentro de recipes y ajustado en cada fold. Las variables con
+cardinalidad alta se agrupan; ver Anexo A.4. -->
+
 (Pendiente.)
 
 ## Hiperparámetros y presupuesto de búsqueda
 
-<!-- Máximo 20 configuraciones por familia, 3 particiones internas. -->
+<!-- Máximo 20 configuraciones por familia, 3 particiones internas.
+Los valores finales por modelo se reportan en Anexo A.5. -->
 
 (Pendiente.)
 
@@ -209,7 +188,8 @@ todo dentro de recipes y ajustado en cada fold. -->
 #| eval: false
 ```
 
-(Pendiente: interpretación con diferencias frente a la referencia y denominadores de evaluación.)
+(Pendiente: interpretación con diferencias frente a la referencia y
+denominadores de evaluación.)
 
 ## Evaluación en reserva
 
@@ -220,12 +200,22 @@ todo dentro de recipes y ajustado en cada fold. -->
 
 (Pendiente: una sola evaluación; no se ajustan hiperparámetros aquí.)
 
+## Matriz de confusión al umbral fijado
+
+```{r tabla-confusion}
+#| tbl-cap: "Matriz de confusión del modelo elegido en reserva, umbral fijado en desarrollo."
+#| eval: false
+```
+
+(Pendiente: interpretación de sensibilidad y VPP con el umbral elegido.)
+
 ## Incertidumbre
 
-```{=html}
 <!-- Bootstrap por edificio (bbl) o por periodo, no por fila. Indicar
-qué se remuestrea, cuántas réplicas y si el modelo se reajusta. -->
-```
+qué se remuestrea, cuántas réplicas y si el modelo se reajusta. Las
+columnas con IC de la diferencia frente a la referencia se reportan en
+las tablas de comparación. -->
+
 (Pendiente.)
 
 ## Análisis de errores
@@ -238,13 +228,20 @@ qué se remuestrea, cuántas réplicas y si el modelo se reajusta. -->
 
 (Pendiente: interpretación y tamaños por subgrupo.)
 
-## Análisis de sensibilidad 1: preparación o representación
+## Análisis de sensibilidad
 
-(Pendiente: retirar historial del área, o agrupar categorías raras de otra forma. Explicar qué decisión se modifica y cómo cambia la conclusión.)
+```{r tabla-sensibilidad}
+#| tbl-cap: "Análisis de sensibilidad: dos decisiones sobre la conclusión."
+#| eval: false
+```
 
-## Análisis de sensibilidad 2: validación, población o estabilidad
+Sensibilidad 1 (preparación o representación): (Pendiente: retirar
+historial del área, o agrupar categorías raras de otra forma. Explicar
+qué decisión se modifica y cómo cambia la conclusión.)
 
-(Pendiente: agrupar solicitudes por `bbl`, o evaluar por periodo o borough. Explicar qué decisión se modifica y cómo cambia la conclusión.)
+Sensibilidad 2 (validación, población o estabilidad): (Pendiente:
+agrupar solicitudes por `bbl`, o evaluar por periodo o borough.
+Explicar qué decisión se modifica y cómo cambia la conclusión.)
 
 # Discusión
 
@@ -254,7 +251,9 @@ qué se remuestrea, cuántas réplicas y si el modelo se reajusta. -->
 
 ## Límites de generalización
 
-(Pendiente: población observada, selección administrativa, cierre administrativo ≠ resolución material, evaluación retrospectiva bajo supuesto de información.)
+(Pendiente: población observada, selección administrativa, cierre
+administrativo ≠ resolución material, evaluación retrospectiva bajo
+supuesto de información.)
 
 ## Condiciones de uso del modelo
 
@@ -266,43 +265,107 @@ qué se remuestrea, cuántas réplicas y si el modelo se reajusta. -->
 
 Comando único:
 
-``` bash
+```bash
 Rscript --vanilla analisis.R
 ```
 
--   Lenguaje: R `r paste(R.version$major, R.version$minor, sep = ".")`.
--   Entorno: `renv` (ver `renv.lock`).
--   Sesión completa: `output/sessionInfo.txt`.
--   Versión del repositorio: commit `<hash>` / tag `<v1.0>`.
--   Tiempo aproximado de ejecución: (Pendiente).
+- Lenguaje: R `r paste(R.version$major, R.version$minor, sep = ".")`.
+- Entorno: `renv` (ver `renv.lock`).
+- Sesión completa: `output/sessionInfo.txt`.
+- Versión del repositorio: commit `<hash>` / tag `<v1.0>`.
+- Tiempo aproximado de ejecución: (Pendiente).
 
 ## Aportes del equipo
 
--   Diego Barrios: (Pendiente.)
--   Renato Bazaes: (Pendiente.)
--   Mauricio Campillay: (Pendiente.)
--   Bruno Zavala: (Pendiente.)
+- Diego Barrios: (Pendiente.)
+- Renato Bazaes: (Pendiente.)
+- Mauricio Campillay: (Pendiente.)
+- Bruno Zavala: (Pendiente.)
 
 ## Declaración de uso de IA
 
--   Herramienta y fecha: (Pendiente.)
--   Propósito: (Pendiente.)
--   Partes afectadas: (Pendiente.)
--   Comprobaciones realizadas: (Pendiente.)
+- Herramienta y fecha: (Pendiente.)
+- Propósito: (Pendiente.)
+- Partes afectadas: (Pendiente.)
+- Comprobaciones realizadas: (Pendiente.)
 
 # Referencias
 
--   NYC Open Data. *311 Service Requests from 2020 to Present*. ID `erm2-nwe9`. https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9
--   Documento del curso EYP3407, “Trabajo final: análisis estadístico reproducible” (12 de octubre de 2026).
+- NYC Open Data. *311 Service Requests from 2020 to Present*. ID `erm2-nwe9`. https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9
+- Documento del curso EYP3407, “Trabajo final: análisis estadístico reproducible” (12 de octubre de 2026).
+- (Añadir referencias metodológicas: James et al. *An Introduction to Statistical Learning*; Kuhn & Silge *Tidy Modeling with R*; documentación de `tidymodels`, `ranger`, `xgboost`.)
 
 # Anexo técnico
 
-```{=html}
-<!-- Máximo 6 páginas. Puede incluir:
-- diccionario resumido de variables usadas,
-- hiperparámetros finales,
-- tablas extendidas por subgrupo,
-- gráficos auxiliares,
-- detalles de implementación. -->
+<!-- Máximo 6 páginas. Contiene la evidencia de auditoría y los detalles
+de implementación que respaldan el cuerpo, sin consumir el límite de
+10–12 páginas. -->
+
+## A.1 Auditoría de la respuesta
+
+```{r anexo-auditoria-Y}
+#| tbl-cap: "A.1. Auditoría de la respuesta Y por caso."
+
+auditoria_Y |>
+  rename(Caso = caso, n = n, `%` = pct) |>
+  knitr::kable(digits = 2)
 ```
+
+(Comentario: cuántas filas caen en cada caso; justificación de las
+exclusiones por duración negativa o `created_date` inválido.)
+
+## A.2 Descripción ampliada de la muestra
+
+```{r anexo-descripcion}
+#| tbl-cap: "A.2. Métricas descriptivas de la muestra analítica."
+
+descripcion |>
+  rename(Métrica = metrica, Valor = valor) |>
+  knitr::kable()
+```
+
+## A.3 Cobertura por año y borough
+
+```{r anexo-cobertura}
+#| tbl-cap: "A.3. Cobertura por año de creación y borough."
+
+cobertura |>
+  knitr::kable()
+```
+
+## A.4 Calidad y cardinalidad de las variables
+
+```{r anexo-calidad}
+#| tbl-cap: "A.4a. Porcentaje de valores faltantes por variable."
+
+calidad_na |>
+  rename(Variable = variable, `% NA` = pct_na) |>
+  knitr::kable(digits = 2)
+```
+
+```{r anexo-cardinalidad}
+#| tbl-cap: "A.4b. Número de niveles por variable categórica."
+
+cardinalidad |>
+  rename(Variable = variable, `Niveles` = n_niveles) |>
+  knitr::kable()
+```
+
+(Comentario: qué variables se agruparon por baja frecuencia y por qué;
+qué variables con NA alto se excluyeron o imputaron.)
+
+## A.5 Hiperparámetros finales por modelo
+
+<!-- Tabla con los hiperparámetros seleccionados por validación para M1,
+M2 y M3, número de configuraciones evaluadas por familia y número de
+particiones internas usadas. Se llena en Fase 4. -->
+
+(Pendiente.)
+
+## A.6 Tablas extendidas por subgrupo
+
+<!-- Errores por distrito, mes y canal en formato extendido; matrices de
+confusión por subgrupo; resultados completos de las dos sensibilidades.
+Se llenan en Fase 5. -->
+
 (Pendiente.)
