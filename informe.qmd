@@ -1,0 +1,308 @@
+---
+title: "Plazos de cierre de solicitudes NYC 311"
+subtitle: "Análisis estadístico reproducible — Caso 08"
+author:
+  - Diego Barrios
+  - Renato Bazaes
+  - Mauricio Campillay
+  - Bruno Zavala
+date: "`r format(Sys.Date(), '%d de %B de %Y')`"
+lang: es
+format:
+  pdf:
+    documentclass: article
+    papersize: a4
+    geometry:
+      - margin=2.5cm
+    toc: false
+    number-sections: true
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    colorlinks: true
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false
+---
+
+```{r setup}
+#| include: false
+
+suppressPackageStartupMessages({
+  library(readr)
+  library(dplyr)
+  library(ggplot2)
+  library(knitr)
+  library(scales)
+  library(lubridate)
+})
+
+ruta_tablas <- "output/tablas"
+
+construccion <- read_csv(file.path(ruta_tablas, "construccion_muestra.csv"), show_col_types = FALSE)
+variables    <- read_csv(file.path(ruta_tablas, "variables.csv"),              show_col_types = FALSE)
+auditoria_Y  <- read_csv(file.path(ruta_tablas, "auditoria_Y.csv"),            show_col_types = FALSE)
+calidad_na   <- read_csv(file.path(ruta_tablas, "calidad_na.csv"),             show_col_types = FALSE)
+cardinalidad <- read_csv(file.path(ruta_tablas, "cardinalidad.csv"),           show_col_types = FALSE)
+descripcion  <- read_csv(file.path(ruta_tablas, "descripcion.csv"),            show_col_types = FALSE)
+cobertura    <- read_csv(file.path(ruta_tablas, "cobertura_anio_borough.csv"), show_col_types = FALSE)
+
+base <- readRDS("output/datos_auditados.rds")
+```
+
+# Resumen ejecutivo
+
+```{=html}
+<!-- Máximo 250 palabras. Debe incluir: problema, resultado principal,
+recomendación y principal limitación. Se completa al final, cuando
+existan los resultados de Fase 4. -->
+```
+(Pendiente: 250 palabras máximo.)
+
+# Problema y datos
+
+## Contexto y pregunta
+
+```{=html}
+<!-- Audiencia, decisión que apoya, población, unidad, respuesta,
+horizonte, disponibilidad de predictores, naturaleza retrospectiva.
+Sale de docs/00_definicion_problema.md. -->
+```
+(Pendiente.)
+
+## Procedencia de los datos
+
+Fuente: NYC Open Data, *311 Service Requests from 2020 to Present* (identificador `erm2-nwe9`). Copia descargada el 12 de octubre de 2026 según `LEEME.txt`. Filtros aplicados en la copia: `agency = HPD`, `complaint_type = PLUMBING`, `created_date` entre 2021-01-01 y 2023-12-31. Los archivos originales no se editaron manualmente.
+
+## Construcción de la muestra
+
+```{r tabla-construccion}
+#| tbl-cap: "Construcción de la muestra analítica."
+
+construccion |>
+  rename(Paso = paso, n = n, `% del total` = pct_del_total) |>
+  knitr::kable(digits = 2)
+```
+
+(Interpretación: qué se excluyó y por qué.)
+
+## Variables admisibles y excluidas
+
+```{r tabla-variables}
+#| tbl-cap: "Variables admisibles y excluidas del modelo."
+
+variables |>
+  rename(Variable = variable, Rol = rol, Razón = razon) |>
+  knitr::kable()
+```
+
+## Descripción de la respuesta y la muestra
+
+```{r tabla-descripcion}
+#| tbl-cap: "Descripción de la muestra analítica."
+
+descripcion |>
+  rename(Métrica = metrica, Valor = valor) |>
+  knitr::kable()
+```
+
+```{r tabla-auditoria-Y}
+#| tbl-cap: "Auditoría de la respuesta Y."
+
+auditoria_Y |>
+  rename(Caso = caso, n = n, `%` = pct) |>
+  knitr::kable(digits = 2)
+```
+
+```{r tabla-cobertura}
+#| tbl-cap: "Cobertura por año y borough."
+
+cobertura |>
+  knitr::kable()
+```
+
+## Calidad de los datos
+
+```{r tabla-calidad}
+#| tbl-cap: "Porcentaje de valores faltantes por variable."
+
+calidad_na |>
+  rename(Variable = variable, `% NA` = pct_na) |>
+  knitr::kable(digits = 2)
+```
+
+```{r tabla-cardinalidad}
+#| tbl-cap: "Número de niveles por variable categórica."
+
+cardinalidad |>
+  rename(Variable = variable, `Niveles` = n_niveles) |>
+  knitr::kable()
+```
+
+(Interpretación: variables candidatas a agrupar categorías raras.)
+
+# Diseño de evaluación
+
+## Particiones
+
+```{=html}
+<!-- Esquema desarrollo/prueba, ventanas temporales, separación de 7 días.
+Incluir un diagrama temporal (figura) que muestre:
+- periodo de desarrollo (2021–2022) con ventanas expansivas,
+- separación de 7 días entre origen de validación y entrenamiento,
+- reserva (2023). -->
+```
+(Pendiente: figura de diagrama temporal.)
+
+```{r fig-diagrama-temporal}
+#| fig-cap: "Diagrama temporal del esquema de particiones."
+#| fig-alt: "Línea de tiempo que muestra desarrollo 2021-2022 con ventanas expansivas y reserva 2023."
+#| echo: false
+#| eval: false
+```
+
+## Información admisible
+
+Solo predictores disponibles al ingreso de la solicitud. Se excluyen `closed_date`, `status`, `resolution_description`, `resolution_action_updated_date`, `due_date` y `unique_key`. El historial del área, si se usa, se construye solo con solicitudes cuyo horizonte de 7 días ya terminó.
+
+## Métrica principal y métricas complementarias
+
+-   Métrica principal: pérdida logarítmica (log-loss).
+-   Complementarias: Brier, AUC ROC, calibración, sensibilidad, VPP con umbral fijado en desarrollo, matriz de confusión.
+
+## Referencia
+
+Tasa histórica de “sin cierre a 7 días” estimada **solo con entrenamiento**.
+
+# Métodos
+
+## Procedimientos comparados
+
+| Procedimiento | Modelo                                                      | Justificación                                                      |
+|------------------------|------------------------|------------------------|
+| Referencia    | Tasa histórica de Y en entrenamiento                        | Alternativa razonable y calculada solo con entrenamiento           |
+| M1            | Regresión logística con penalización elegida por validación | Base interpretable; maneja alta dimensionalidad tras codificación  |
+| M2            | (Árbol podado o SVM de clasificación)                       | Captura no linealidades / interacciones con control de complejidad |
+| M3            | (Random forest o boosting)                                  | Ensamble con mejor capacidad predictiva esperada                   |
+
+## Preprocesamiento
+
+```{=html}
+<!-- Imputación simple, agrupación de categorías raras, codificación,
+todo dentro de recipes y ajustado en cada fold. -->
+```
+(Pendiente.)
+
+## Hiperparámetros y presupuesto de búsqueda
+
+<!-- Máximo 20 configuraciones por familia, 3 particiones internas. -->
+
+(Pendiente.)
+
+# Resultados
+
+## Comparación en desarrollo
+
+```{r tabla-desarrollo}
+#| tbl-cap: "Comparación de modelos en desarrollo."
+#| eval: false
+```
+
+(Pendiente: interpretación con diferencias frente a la referencia y denominadores de evaluación.)
+
+## Evaluación en reserva
+
+```{r tabla-prueba}
+#| tbl-cap: "Evaluación final en reserva (2023)."
+#| eval: false
+```
+
+(Pendiente: una sola evaluación; no se ajustan hiperparámetros aquí.)
+
+## Incertidumbre
+
+```{=html}
+<!-- Bootstrap por edificio (bbl) o por periodo, no por fila. Indicar
+qué se remuestrea, cuántas réplicas y si el modelo se reajusta. -->
+```
+(Pendiente.)
+
+## Análisis de errores
+
+```{r fig-diagnostico}
+#| fig-cap: "Errores por subgrupo (distrito, mes y canal)."
+#| fig-alt: "Paneles que muestran el error del modelo elegido por distrito, mes y canal."
+#| eval: false
+```
+
+(Pendiente: interpretación y tamaños por subgrupo.)
+
+## Análisis de sensibilidad 1: preparación o representación
+
+(Pendiente: retirar historial del área, o agrupar categorías raras de otra forma. Explicar qué decisión se modifica y cómo cambia la conclusión.)
+
+## Análisis de sensibilidad 2: validación, población o estabilidad
+
+(Pendiente: agrupar solicitudes por `bbl`, o evaluar por periodo o borough. Explicar qué decisión se modifica y cómo cambia la conclusión.)
+
+# Discusión
+
+## Respuesta a la pregunta inicial
+
+(Pendiente.)
+
+## Límites de generalización
+
+(Pendiente: población observada, selección administrativa, cierre administrativo ≠ resolución material, evaluación retrospectiva bajo supuesto de información.)
+
+## Condiciones de uso del modelo
+
+(Pendiente: cuándo la recomendación es confiable y cuándo no.)
+
+# Reproducibilidad y contribuciones
+
+## Ejecución
+
+Comando único:
+
+``` bash
+Rscript --vanilla analisis.R
+```
+
+-   Lenguaje: R `r paste(R.version$major, R.version$minor, sep = ".")`.
+-   Entorno: `renv` (ver `renv.lock`).
+-   Sesión completa: `output/sessionInfo.txt`.
+-   Versión del repositorio: commit `<hash>` / tag `<v1.0>`.
+-   Tiempo aproximado de ejecución: (Pendiente).
+
+## Aportes del equipo
+
+-   Diego Barrios: (Pendiente.)
+-   Renato Bazaes: (Pendiente.)
+-   Mauricio Campillay: (Pendiente.)
+-   Bruno Zavala: (Pendiente.)
+
+## Declaración de uso de IA
+
+-   Herramienta y fecha: (Pendiente.)
+-   Propósito: (Pendiente.)
+-   Partes afectadas: (Pendiente.)
+-   Comprobaciones realizadas: (Pendiente.)
+
+# Referencias
+
+-   NYC Open Data. *311 Service Requests from 2020 to Present*. ID `erm2-nwe9`. https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9
+-   Documento del curso EYP3407, “Trabajo final: análisis estadístico reproducible” (12 de octubre de 2026).
+
+# Anexo técnico
+
+```{=html}
+<!-- Máximo 6 páginas. Puede incluir:
+- diccionario resumido de variables usadas,
+- hiperparámetros finales,
+- tablas extendidas por subgrupo,
+- gráficos auxiliares,
+- detalles de implementación. -->
+```
+(Pendiente.)

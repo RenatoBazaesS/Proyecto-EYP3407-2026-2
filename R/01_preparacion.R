@@ -38,7 +38,8 @@ datos <- datos_raw |>
 n_created_na <- sum(is.na(datos$created_date))
 message("created_date no parseable: ", n_created_na)
 
-# Hay un NA! Lo vamos a eliminar ya que es solamente un dato.
+# Hay un NA de fecha de created_date! Lo vamos a eliminar ya que es solamente un dato.
+# No es posible imputarlo.
 
 # --- 4. Construcción de la respuesta Y ---------------------------------
 # La escala será en horas. Entonces, 7 dias = 168 horas. 

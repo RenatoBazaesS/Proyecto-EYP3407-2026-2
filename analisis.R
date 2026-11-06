@@ -14,7 +14,7 @@ source("R/04_evaluacion.R")
 source("R/05_diagnostico.R")
 
 # Render del informe (se activa cuando exista informe.qmd)
-# quarto::quarto_render("informe.qmd")
+quarto::quarto_render("informe.qmd")
 
 writeLines(capture.output(sessionInfo()), "output/sessionInfo.txt")
 cat("Tiempo total:", format(Sys.time() - t0), "\n")
