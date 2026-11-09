@@ -1,0 +1,259 @@
+---
+title: "¿Seguirá abierta a los 7 días?"
+subtitle: "Solicitudes de plomería HPD en NYC 311 — Caso 08, EYP3407"
+author: "Diego Barrios · Renato Bazaes · Mauricio Campillay · Bruno Zavala"
+date: "12 de noviembre de 2026"
+lang: es
+format:
+  beamer:
+    aspectratio: 169
+    theme: default
+    colortheme: seahorse
+    fonttheme: professionalfonts
+    slide-level: 2
+    section-titles: false
+    include-in-header:
+      text: |
+        \setbeamertemplate{navigation symbols}{}
+        \setbeamertemplate{footline}[frame number]
+        \setbeamercovered{invisible}
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+# Toda cifra de estas láminas proviene de output/, generado por analisis.R.
+suppressPackageStartupMessages({
+  library(readr)
+  library(dplyr)
+  library(knitr)
+})
+options(knitr.kable.NA = "—")
+leer <- function(a) read_csv(file.path("output/tablas", a), show_col_types = FALSE)
+
+dec   <- function(x, d = 3) formatC(x, format = "f", digits = d, decimal.mark = ",")
+pct   <- function(x, d = 1) paste0(dec(100 * x, d), " %")
+miles <- function(x) format(x, big.mark = ".", decimal.mark = ",", scientific = FALSE, trim = TRUE)
+
+# Tabla compacta en LaTeX con coma decimal.
+tabla <- function(d, digits = 3) {
+  cat("\\footnotesize\n")
+  print(knitr::kable(d, format = "latex", booktabs = TRUE, digits = digits,
+                     format.args = list(decimal.mark = ",", big.mark = ".")))
+  cat("\\normalsize\n")
+}
+
+auditoria   <- leer("auditoria_Y.csv")
+construc    <- leer("construccion_muestra.csv")
+particiones <- leer("particiones.csv")
+desarrollo  <- leer("comparacion_desarrollo.csv")
+reserva     <- leer("comparacion_reserva.csv")
+sel         <- leer("seleccion.csv")
+sens        <- leer("sensibilidad.csv")
+inc         <- leer("incertidumbre_reserva.csv")
+conf        <- leer("umbral_reserva.csv")
+calib       <- leer("calibracion_resumen.csv")
+hiper       <- leer("hiperparametros.csv")
+subg        <- leer("errores_subgrupos_reserva.csv")
+estab       <- leer("estabilidad_borough_desarrollo.csv")
+matriz      <- leer("matriz_confusion_reserva.csv")
+
+base <- readRDS("output/datos_auditados.rds")
+N <- nrow(base)
+elegido <- sel$modelo_elegido
+r_el  <- filter(reserva, modelo == elegido)
+d_el  <- filter(desarrollo, modelo == elegido)
+d_m3  <- filter(desarrollo, startsWith(modelo, "M3"))
+r_ref <- filter(reserva, startsWith(modelo, "Ref"))
+bbl   <- filter(inc, startsWith(unidad_remuestreada, "Inmueble"))
+s_val <- function(esc, mod) filter(sens, startsWith(escenario, esc), modelo == mod)
+```
+
+# 1. Problema, población y respuesta
+
+## Priorizar seguimiento desde el primer momento
+
+**Decisión que apoya:** al ingresar una solicitud, HPD podría priorizar las de mayor riesgo de seguir sin cierre administrativo a los 7 días.
+
+- **Población:** solicitudes HPD `PLUMBING` creadas entre 2021 y 2023
+- **Unidad:** una solicitud única (`unique_key`)
+- **Respuesta:** $Y = 1$ si no se registra cierre en las primeras 168 horas
+- **Predicción:** emitida al ingreso, sólo con información disponible en ese momento
+
+\bigskip
+**Lo que no afirmamos:** cierre administrativo no es resolución material, y predecir no es explicar causas.
+
+## De `r miles(N)` solicitudes a una respuesta auditada
+
+- `r miles(N)` solicitudes de `r miles(n_distinct(base$bbl, na.rm = TRUE))` inmuebles; ninguna fila excluida
+- **`r pct(mean(base$Y))`** sin cierre a 7 días
+- Solicitudes abiertas se conservan: `r miles(auditoria$n[auditoria$caso == "sin cierre registrado"])` sin cierre registrado cuentan como $Y = 1$
+- `closed_date`, `status` y campos de resolución quedan fuera: revelan el resultado
+
+\bigskip
+**Error propio detectado y corregido:** las fechas exactamente a medianoche se perdían al convertirlas. Excluía 1 solicitud y ocultaba 7 cierres. Ahora el código comprueba que no se pierda ninguna.
+
+# 2. Diseño de validación
+
+## La validación imita el uso real
+
+```{r}
+#| out-width: 92%
+knitr::include_graphics("output/figuras/diagrama_temporal.png")
+```
+
+\small
+Cada entrenamiento sólo usa solicitudes con respuesta conocida antes del origen. La reserva 2023 (`r miles(particiones$n_valida[particiones$particion == "Reserva"])` solicitudes) se evaluó una sola vez.
+
+## Misma información para todos, y una referencia honesta
+
+**Información admisible**
+
+- Calendario: mes, día de la semana, hora
+- Canal, detalle del problema, ubicación agregada
+- Historial: volumen reciente y tasa de distrito, sólo con solicitudes cuyo horizonte de 7 días ya terminó
+
+\medskip
+**Referencia:** tasa histórica sin cierre, calculada sólo con entrenamiento
+
+\medskip
+**Métrica principal:** pérdida logarítmica, porque el producto es una probabilidad
+
+\medskip
+**Regla fijada de antemano:** menor log-loss; si un modelo más simple queda a menos de 0,002, se prefiere el simple
+
+# 3. Métodos, resultados y diagnóstico
+
+## En desarrollo, la complejidad casi no aporta
+
+```{r}
+#| results: asis
+desarrollo |>
+  select(Modelo = modelo, `Log-loss` = log_loss, `Dif. referencia` = dif_vs_ref, Brier = brier, AUC = auc) |>
+  tabla(digits = 4)
+```
+
+\medskip
+
+- Promedio de 3 ventanas temporales, `r miles(d_el$n_validacion)` solicitudes evaluadas
+- Boosting supera a lasso por `r dec(d_el$log_loss - d_m3$log_loss, 4)`: dentro de la tolerancia
+- **Elegido por la regla: `r elegido`**, más simple e interpretable
+
+## En 2023 se confirma la mejora frente a la referencia
+
+```{r}
+#| results: asis
+reserva |>
+  select(Modelo = modelo, `Log-loss` = log_loss, `Dif. referencia` = dif_vs_ref, AUC = auc,
+         Sensib. = sensibilidad, VPP = vpp) |>
+  tabla(digits = 4)
+```
+
+\medskip
+
+- `r miles(r_el$n)` solicitudes; prevalencia `r pct(r_el$prevalencia)`
+- Umbral fijado en desarrollo: `r dec(conf$umbral)`; especificidad `r pct(conf$especificidad)`
+- El árbol resultó levemente mejor en 2023, pero no se cambia de modelo tras ver la reserva
+
+## Dónde funciona y dónde no
+
+```{r}
+#| out-width: 55%
+knitr::include_graphics("output/figuras/diagnostico_subgrupos.png")
+```
+
+\vspace{-0.4em}
+\footnotesize
+Valores negativos indican mejora frente a la referencia. La ganancia varía sobre todo con el detalle del problema: `STEAM PIPE/RISER` y `WATER SUPPLY` concentran la mayor mejora.
+
+# 4. Sensibilidad, recomendación, límites y reproducibilidad
+
+## La conclusión resiste los cambios probados
+
+**Incertidumbre en 2023** (diferencia de log-loss de `r elegido` frente a referencia)
+
+- `r dec(bbl$dif_log_loss, 4)`; IC 95 % bootstrap por inmueble: [`r dec(bbl$ic95_inf, 4)`; `r dec(bbl$ic95_sup, 4)`]
+- Con predicciones fijas: no incluye selección ni entrenamiento
+
+**Sensibilidad en desarrollo**
+
+```{r}
+#| results: asis
+bind_rows(
+  s_val("Base", elegido), s_val("S1", elegido), s_val("S2", elegido)
+) |>
+  transmute(Escenario = escenario, n = n_validacion, `Log-loss` = log_loss, `Dif. referencia` = dif_vs_ref, AUC = auc) |>
+  tabla(digits = 4)
+```
+
+## Recomendación y condiciones de uso
+
+**Recomendación** *[borrador: el equipo debe ajustarla]*
+
+- Usar `r elegido` como apoyo para ordenar el seguimiento, no como decisión automática
+- Discrimina de forma moderada (AUC `r dec(r_el$auc)`) y sobreestima algo el no cierre en 2023
+
+**Límites**
+
+- Evaluación retrospectiva con estado administrativo revisado a octubre de 2026
+- Poco confiable en detalles con muy pocos casos, como `SEWER` o `BOILER`
+
+**Reproducibilidad:** un solo comando, R 4.6.2 y paquetes fijados; `r readLines("output/tablas/tiempo_ejecucion_min.txt")` minutos en Windows
+
+# Apoyo
+
+## Apoyo: matriz de confusión en 2023
+
+```{r}
+#| results: asis
+tabla(matriz, digits = 0)
+```
+
+\medskip
+
+- Sensibilidad: `r pct(conf$sensibilidad)` · VPP: `r pct(conf$vpp)` · Especificidad: `r pct(conf$especificidad)`
+- El umbral maximiza el índice de Youden en desarrollo y pesa por igual ambos errores
+
+## Apoyo: calibración en 2023
+
+```{r}
+#| out-width: 42%
+knitr::include_graphics("output/figuras/calibracion.png")
+```
+
+\footnotesize
+Intercepto `r dec(calib$intercepto)`, pendiente `r dec(calib$pendiente)`. La prevalencia bajó de `r pct(particiones$tasa_entrena[particiones$particion == "Reserva"])` en entrenamiento a `r pct(r_el$prevalencia)` en 2023.
+
+## Apoyo: hiperparámetros y costo
+
+```{r}
+#| results: asis
+hiper |>
+  transmute(Modelo = sub(":.*", "", modelo), `Elegidos` = hiperparametros, Minutos = minutos_busqueda) |>
+  tabla(digits = 1)
+```
+
+\medskip
+Boosting quedó con 100 árboles, el mínimo de la búsqueda; el rango se mantuvo fijo para no alterar el diseño.
+
+## Apoyo: estabilidad por borough en desarrollo
+
+```{r}
+#| results: asis
+estab |>
+  transmute(Borough = borough, n, Prevalencia = prevalencia, `Log-loss elegido` = elegido,
+            `Log-loss referencia` = ref, `Dif. referencia` = dif_vs_ref) |>
+  tabla(digits = 3)
+```
+
+## Apoyo: ¿qué aportan las sensibilidades a cada modelo?
+
+```{r}
+#| results: asis
+sens |>
+  transmute(Escenario = escenario, Modelo = modelo, `Log-loss` = log_loss, `Dif. referencia` = dif_vs_ref) |>
+  tabla(digits = 4)
+```
