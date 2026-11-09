@@ -320,14 +320,6 @@ if (!is.null(confusion)) knitr::kable(confusion, format.args = list(big.mark = "
 figura("calibracion.png")
 ```
 
-## Matriz de confusión al umbral fijado
-
-```{r tabla-confusion}
-#| tbl-cap: "Matriz de confusión del modelo elegido en reserva, umbral fijado en desarrollo."
-#| eval: false
-```
-
-(Pendiente: interpretación de sensibilidad y VPP con el umbral elegido.)
 
 ## Incertidumbre
 
