@@ -6,7 +6,7 @@ author:
   - Renato Bazaes
   - Mauricio Campillay
   - Bruno Zavala
-date: "Noviembre de 2026"
+date: "12/11/2016"
 lang: es
 format:
   pdf:
@@ -222,6 +222,9 @@ entrenamiento. Además se construyen tres variables de historial:
 - número de solicitudes previas del mismo inmueble en los 90 días anteriores.
 
 ## Métricas, referencia y regla de selección
+- Métrica principal: pérdida logarítmica (log-loss).
+- Complementarias: Brier, AUC ROC, calibración, sensibilidad, VPP con
+  umbral fijado en desarrollo, matriz de confusión.
 
 La métrica principal es la **pérdida logarítmica**, porque el resultado de uso es una
 probabilidad y esta métrica penaliza las probabilidades mal calibradas. Como complemento se
@@ -316,6 +319,15 @@ if (!is.null(confusion)) knitr::kable(confusion, format.args = list(big.mark = "
 
 figura("calibracion.png")
 ```
+
+## Matriz de confusión al umbral fijado
+
+```{r tabla-confusion}
+#| tbl-cap: "Matriz de confusión del modelo elegido en reserva, umbral fijado en desarrollo."
+#| eval: false
+```
+
+(Pendiente: interpretación de sensibilidad y VPP con el umbral elegido.)
 
 ## Incertidumbre
 
