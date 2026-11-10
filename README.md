@@ -1,7 +1,7 @@
 # EYP3407 — Caso 08: Plazos de cierre de solicitudes NYC 311
 
 ## Integrantes
-- Diego Barrios (@nickname1)
+- Diego Barrios [@bluebpts](https://github.com/bluebpts)
 - Renato Bazaes [@RenatoBazaesS](https://github.com/RenatoBazaesS)
 - Mauricio Campillay [@mauricio-campillay-mm](https://github.com/mauricio-campillay-mm)
 - Bruno Zavala (@nickname4)
@@ -22,8 +22,7 @@ el cierre administrativo no equivale a resolución material y no se afirman efec
 - Quarto 1.11.9 y una distribución LaTeX (`quarto install tinytex`).
 - Gestión de dependencias: `renv` 1.3.1; `renv.lock` fija 129 paquetes en
   Posit Package Manager con fecha 2026-11-06, con binarios para Windows y Linux.
-- Paquetes principales usados:  `readr`, `dplyr`, `lubridate`, `tidymodels`,
-  `ranger`, `xgboost`, `yardstick`, `probably`,
+- Paquetes principales usados:  `readr`, `dplyr`, `lubridate`, `tidymodels`, `xgboost`,     `yardstick`, `rpart`, `glmnet`, `patchwork` 
   `ggplot2`, `scales`, `quarto`
 
 ## Estructura del proyecto (por ahora)
@@ -31,7 +30,7 @@ el cierre administrativo no equivale a resolución material y no se afirman efec
 ```text
 proyecto/
 │
-├── instalar.R                      # instala las versiones exactas de renv.lock
+├── instalar.R                      # instala las versiones exactas de renv.lock para ejecución
 ├── analisis.R                      # punto de entrada único (ejecuta y genera todo)
 ├── README.md
 ├── renv.lock                       # versiones exactas de paquetes
@@ -47,9 +46,8 @@ proyecto/
 │   └── 06_reserva.R                # evaluación única 2023, incertidumbre, errores por subgrupo
 │
 ├── datos/
-│   ├── caso08_nyc311.zip           # paquete original sin editar
-│   ├── datos.csv                   # extraído del zip
-│   ├── diccionario.csv             # definiciones de variable
+│   ├── caso08_nyc311.zip           # paquete de datos original sin editar
+│   ├── diccionario.csv             # definiciones de variables
 │   └── LEEME.txt                   # información de los datos
 │
 ├── docs/
@@ -77,7 +75,6 @@ proyecto/
 3. Desde la raíz del proyecto, instalar paquetes y LaTeX:
    ```bash
    Rscript --vanilla instalar.R
-   quarto install tinytex
    ```
 
 En Windows no se necesita Rtools y `datos.csv` se extrae solo. Si R no está en
