@@ -22,8 +22,7 @@ el cierre administrativo no equivale a resolución material y no se afirman efec
 - Quarto 1.11.9 y una distribución LaTeX (`quarto install tinytex`).
 - Gestión de dependencias: `renv` 1.3.1; `renv.lock` fija 129 paquetes en
   Posit Package Manager con fecha 2026-11-06, con binarios para Windows y Linux.
-- Paquetes principales usados:  `readr`, `dplyr`, `lubridate`, `tidymodels`, `xgboost`,     `yardstick`, `rpart`, `glmnet`, `patchwork` 
-  `ggplot2`, `scales`, `quarto`
+- Paquetes principales usados:  `readr`, `dplyr`, `lubridate`, `tidymodels`, `xgboost`,     `yardstick`, `rpart`, `glmnet`, `patchwork`, `ggplot2`, `scales`, `quarto`.
 
 ## Estructura del proyecto (por ahora)
 
