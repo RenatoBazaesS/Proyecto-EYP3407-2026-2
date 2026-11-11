@@ -34,7 +34,9 @@ proyecto/
 ├── README.md
 ├── .Rprofile                       # gestión de dependencias
 ├── Proyecto-EYP3407-2026-2.Rproj   # archivo de configuración del proyecto
-├── renv.lock                       # versiones exactas de paquetes
+├── presentacion.pdf
+├── informe.pdf   
+├── renv.lock                      # versiones exactas de paquetes
 │
 ├── R/                              
 │   ├── 00_entorno.R                # verifica entorno y datos; fija opciones deterministas
