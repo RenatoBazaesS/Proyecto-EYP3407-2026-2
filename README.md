@@ -50,6 +50,10 @@ proyecto/
 │   ├── diccionario.csv             # definiciones de variables
 │   └── LEEME.txt                   # información de los datos
 │
+├── renv/                           # archivos con librería de paquetes propia del proyecto
+│   ├── .gitignore          
+│   ├── activate.R             
+│   └── settings.json                   
 │
 └── output/                         # se genera al ejecutar analisis.R
     ├── tablas/
