@@ -4,7 +4,7 @@
 - Diego Barrios [@bluebpts](https://github.com/bluebpts)
 - Renato Bazaes [@RenatoBazaesS](https://github.com/RenatoBazaesS)
 - Mauricio Campillay [@mauricio-campillay-mm](https://github.com/mauricio-campillay-mm)
-- Bruno Zavala (@nickname4)
+- Bruno Zavala
 
 ## Caso asignado
 Caso 08 — NYC 311. Pregunta: al ingresar una solicitud de la agencia HPD con categoría PLUMBING entre 2021 y 2023,
@@ -18,7 +18,7 @@ el cierre administrativo no equivale a resolución material y no se afirman efec
 
 
 ## Entorno
-- Lenguaje: R 4.6.2 (recomendado; con otra versión `analisis.R` avisa y continúa).
+- Lenguaje: R 4.6.2 (recomendado).
 - Quarto 1.11.9 y una distribución LaTeX (`quarto install tinytex`).
 - Gestión de dependencias: `renv` 1.3.1; `renv.lock` fija 129 paquetes en
   Posit Package Manager con fecha 2026-11-06, con binarios para Windows y Linux.
@@ -32,8 +32,9 @@ proyecto/
 ├── instalar.R                      # instala las versiones exactas de renv.lock para ejecución
 ├── analisis.R                      # punto de entrada único (ejecuta y genera todo)
 ├── README.md
+├── .Rprofile                       # gestión de dependencias
+├── Proyecto-EYP3407-2026-2.Rproj   # archivo de configuración del proyecto
 ├── renv.lock                       # versiones exactas de paquetes
-├── informe.qmd                     # fuente del informe (genera informe.pdf)
 │
 ├── R/                              
 │   ├── 00_entorno.R                # verifica entorno y datos; fija opciones deterministas
@@ -49,8 +50,6 @@ proyecto/
 │   ├── diccionario.csv             # definiciones de variables
 │   └── LEEME.txt                   # información de los datos
 │
-├── docs/
-│   └── 00_definicion_problema.md
 │
 └── output/                         # se genera al ejecutar analisis.R
     ├── tablas/
@@ -94,29 +93,28 @@ diagnóstico y la generación de `informe.pdf`, tablas y figuras.
 
 ## Reproducibilidad y costo
 - Semilla fija: `set.seed(3407)` en `analisis.R`.
-- Tiempo aproximado de ejecución: 19 min, con 4 hilos para `xgboost`.
-- Sistema de referencia: Windows 11 x64, R 4.6.2, 16 GB de RAM.
+- Tiempo aproximado de ejecución: 20 min, con 4 hilos para `xgboost`.
+- Sistema de referencia: Windows 11 x64, R 4.6.2.
 - La sesión completa queda registrada en `output/sessionInfo.txt`.
 
 ## Prueba desde una copia limpia
-- Fecha: 8 de noviembre de 2026.
+- Fecha: 9 de noviembre de 2026.
 - Comando utilizado: `Rscript --vanilla instalar.R` y `Rscript --vanilla analisis.R`.
-- Resultado: ejecución completa en 19 min desde un clon limpio, con tablas de resultados
-  idénticas a una corrida anterior.
-- Sistema: Windows 11 x64, R 4.6.2, en el equipo de desarrollo.
-- Prueba en el computador de otro integrante: <fecha, sistema, comando y resultado>.
+- Resultado: ejecución completa en 20 min desde un clon limpio y con tablas de resultados generadas idénticas a una corrida anterior.
+- Sistema: Windows 11 x64, R 4.5.0, en el equipo de desarrollo.
+
 
 ## Aportes del equipo
-- Diego Barrios: <aporte>.
-- Renato Bazaes: <aporte>.
-- Mauricio Campillay: <aporte>.
-- Bruno Zavala: <aporte>.
+- Diego Barrios: Desarrollo de informe y presentación.
+- Renato Bazaes: Creación de repositorio, desarrollo de scripts de análisis.
+- Mauricio Campillay: Desarrollo de scripts de análisis.
+- Bruno Zavala: Desarrollo de informe y presentación.
 
 ## Declaración de uso de IA
-- Herramienta y fecha: Claude Code (modelo Claude Opus 5.5), 8 de noviembre de 2026. <agregar otras herramientas usadas por el equipo>.
+- Herramienta y fecha: Claude Code (modelo Claude Opus 5.5), entre el 8 de noviembre y 10 de noviembre de 2026.
 - Propósito: programación, depuración, entorno reproducible y borrador de secciones descriptivas y diapositivas.
-- Partes afectadas: `analisis.R`, `instalar.R`, `R/00_entorno.R` a `R/06_reserva.R`, `informe.qmd`, `presentacion.qmd` y este archivo.
-- Comprobaciones realizadas: ejecución completa desde un clon limpio. <agregar la revisión manual y verificación hecha por el equipo>.
+- Partes afectadas: `analisis.R`, `instalar.R`, `R/00_entorno.R` a `R/06_reserva.R`, y este archivo.
+- Comprobaciones realizadas: ejecución completa desde un clon limpio desde la versión comprimida .zip.
 
 ## Referencias
 - NYC Open Data. *311 Service Requests from 2020 to Present*. ID erm2-nwe9.

@@ -22,6 +22,6 @@ writeLines(capture.output(sessionInfo()), "output/sessionInfo.txt")
 tiempo_min <- as.numeric(difftime(Sys.time(), t0, units = "mins"))
 writeLines(sprintf("%.1f", tiempo_min), "output/tablas/tiempo_ejecucion_min.txt")
 
-quarto::quarto_render("informe.qmd")
-quarto::quarto_render("presentacion.qmd")
+#quarto::quarto_render("informe.qmd")
+#quarto::quarto_render("presentacion.qmd")
 cat("Tiempo total:", format(Sys.time() - t0), "\n")
